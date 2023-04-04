@@ -6,7 +6,7 @@ https://wiki.gnupg.org/WKD
 
 ## Running this project
 
-Put your *public* keys into `./openpgp/keys`.
+Put your _public_ keys into `./openpgp/keys`.
 Optionally, put your policy into a text file in `./openpgp`.
 
 ```shell
@@ -31,6 +31,4 @@ Options:
 
 This server will refuse to serve private or invalid keys.
 If a file contains a private and a public key, only the public key will be served.
-Nonetheless, make sure to only include your private key.
-
-
+Nonetheless, make sure to only include your public key.
