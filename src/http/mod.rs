@@ -5,7 +5,7 @@ pub mod policy;
 use crate::config::Config;
 use anyhow::Context;
 use axum::Router;
-use std::sync::Arc;
+use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
@@ -15,13 +15,16 @@ pub struct ApiContext {
 }
 
 pub async fn serve(config: Config) -> anyhow::Result<()> {
+    let socket_addr: SocketAddr = format!("{}:{}", config.address, config.port)
+        .as_str()
+        .parse()?;
     let app = api_router()
         .with_state(ApiContext {
             config: Arc::new(config),
         })
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
 
-    axum::Server::bind(&"0.0.0.0:8080".parse()?)
+    axum::Server::bind(&socket_addr)
         .serve(app.into_make_service())
         .await
         .context("error running HTTP server")

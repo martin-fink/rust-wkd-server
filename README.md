@@ -6,7 +6,8 @@ https://wiki.gnupg.org/WKD
 
 ## Running this project
 
-Put your _public_ keys into `./openpgp/keys`.
+Put your _public_ keys into `./openpgp/keys`. Files should be named like the
+email address that the key is registered for.
 Optionally, put your policy into a text file in `./openpgp`.
 
 ```shell
@@ -23,8 +24,10 @@ Arguments:
   <KEYS_PATH>  The path where the GPG keys are stored
 
 Options:
-  -p, --policy <POLICY>  The path to the policy file. If not set, an empty policy is served [env: POLICY=]
-  -h, --help             Print help
+      --address <ADDRESS>  [env: ADDRESS=] [default: 0.0.0.0]
+      --port <PORT>        [env: PORT=] [default: 8080]
+  -p, --policy <POLICY>    The path to the policy file. If not set, an empty policy is served [env: POLICY=]
+  -h, --help               Print help
 ```
 
 ### Security
