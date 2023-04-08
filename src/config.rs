@@ -6,6 +6,10 @@ use std::path::Path;
 pub struct Config {
     /// The path where the GPG keys are stored
     pub keys_path: String,
+    #[clap(long, env, default_value = "0.0.0.0")]
+    pub address: String,
+    #[clap(long, env, default_value = "8080")]
+    pub port: String,
     /// The path to the policy file. If not set, an empty policy is served.
     #[clap(long, short, env)]
     pub policy: Option<String>,
