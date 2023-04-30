@@ -9,7 +9,20 @@ use std::path::Path;
 use tokio::fs;
 
 /// Match any text that has one @ sign and split at the @ sign
-static FILE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new("^([^@]+)@([^@]+)$").unwrap());
+/// Trailing optional .asc is not included in the domain. See some examples below.
+///
+/// Will be included:
+/// ```
+/// user@example.com
+/// user2@example.com.asc
+/// ```
+///
+/// Will not be included:
+/// ```
+/// ktujkt7nrz91b17es7prizffedzxrsna
+/// my-public-key.asc
+/// ```
+static FILE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^([^@]+)@([^@]+?)(?:\.asc)?$").unwrap());
 
 pub async fn get_key_for_hash(path: &str, hash: &str, domain: &str) -> Result<Option<Vec<u8>>> {
     let path = Path::new(path);

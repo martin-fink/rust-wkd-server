@@ -6,8 +6,17 @@ https://wiki.gnupg.org/WKD
 
 ## Running this project
 
-Put your _public_ keys into `./openpgp/keys`. Files should be named like the
-email address that the key is registered for.
+Put your __public__ keys into `./openpgp/keys`.
+Files should be named after the email address that the key is registered for.
+See some examples below:
+
+- Valid names:
+  - `user@example.com`
+  - `user@example.com.asc` (optional `.asc` file ending will be ignored)
+- Invalid names:
+  - `ktujkt7nrz91b17es7prizffedzxrsna` (wkd hash -- this tool will hash the username)
+  - `my-public-key.asc`
+
 Optionally, put your policy into a text file in `./openpgp`.
 
 ```shell
