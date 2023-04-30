@@ -44,3 +44,18 @@ Options:
 This server will refuse to serve private or invalid keys.
 If a file contains a private and a public key, only the public key will be served.
 Nonetheless, make sure to only include your public key.
+
+### Deployment
+
+You can use this `docker-compose.yaml` example file as a starting off point for your
+deployment. Make sure to add your public keys as a volume.
+
+```
+services:
+    wkd-server:
+        image: ghcr.io/martin-fink/rust-wkd-server:latest
+        volumes:
+            - ./keys:/openpgp-keys:ro
+        ports:
+            - 127.0.0.1:8080:8080
+```
