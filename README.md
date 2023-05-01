@@ -59,3 +59,19 @@ services:
         ports:
             - 127.0.0.1:8080:8080
 ```
+
+#### Reverse proxy setup
+
+You probably want to move this behind a reverse proxy such as nginx in order for it to handle https.
+You can use the following snippet for nginx.
+The important bit is to set the `X-Forwarded-Host` header, as that header is used to differentiate domains.
+
+```nginx
+location ^~ /.well-known/openpgpkey {
+    resolver 127.0.0.11 valid=5s;
+    set $upstream_endpoint http://address:port;
+    proxy_pass $upstream_endpoint;
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-Host $host;
+}
+```
