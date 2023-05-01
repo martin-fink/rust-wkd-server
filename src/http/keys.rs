@@ -4,15 +4,17 @@ use crate::utils::keys;
 use axum::extract::{Host, Path, State};
 use axum::routing::get;
 use axum::Router;
+use log::info;
 
 type KeyResponse = Vec<u8>;
 
 pub async fn get_key(
     State(state): State<ApiContext>,
     Path(hash): Path<String>,
-    Host(hostname): Host,
+    Host(domain): Host,
 ) -> Result<KeyResponse, ApiError> {
-    if let Some(key) = keys::get_key_for_hash(&state.config.keys_path, &hash, &hostname).await? {
+    info!("Got request for domain {domain}, hash {hash}");
+    if let Some(key) = keys::get_key_for_hash(&state.config.keys_path, &hash, &domain).await? {
         Ok(key)
     } else {
         Err(ApiError::NotFound)

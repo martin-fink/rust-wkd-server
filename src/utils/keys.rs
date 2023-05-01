@@ -6,6 +6,7 @@ use sequoia_openpgp as openpgp;
 use sha1::{Digest, Sha1};
 use std::io::Read;
 use std::path::Path;
+use log::trace;
 use tokio::fs;
 
 /// Match any text that has one @ sign and split at the @ sign
@@ -37,20 +38,25 @@ pub async fn get_key_for_hash(path: &str, hash: &str, domain: &str) -> Result<Op
             return Err(anyhow!("Filename is not valid utf-8: {:?}", &file.file_name()));
         };
         let Some(captures) = FILE_REGEX.captures(filename) else {
+            trace!("Ignoring '{filename}'.");
             continue;
         };
 
         // Unwrap is ok here, as we know the regex
         let username = captures.get(1).unwrap().as_str();
         let host = captures.get(2).unwrap().as_str();
+        trace!("Trying file {filename} (username = {username}, domain = {host})");
 
         if host != domain {
             continue;
         }
 
         let hashed_name = hash_file_name(username);
+        trace!("Username hash: {hashed_name}");
 
         if hashed_name == hash {
+            trace!("Found match, trying to read public key.");
+
             // We found the file, read its contents
             let content = fs::read_to_string(file.path()).await?;
 
