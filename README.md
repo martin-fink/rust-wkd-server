@@ -50,7 +50,7 @@ Nonetheless, make sure to only include your public key.
 You can use this `docker-compose.yaml` example file as a starting off point for your
 deployment. Make sure to add your public keys as a volume.
 
-```
+```yaml
 services:
     wkd-server:
         image: ghcr.io/martin-fink/rust-wkd-server:latest
