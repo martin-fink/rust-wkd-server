@@ -11,7 +11,7 @@ RUN set -x && cargo build --release
 # Create a minimal docker image 
 FROM debian:bullseye-slim
 
-ENV RUST_LOG="error,wkd-server=info"
+ENV RUST_LOG="error,wkd_server=info"
 COPY --from=build-stage /target/release/wkd-server /wkd-server
 
 EXPOSE 8080
