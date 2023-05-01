@@ -11,8 +11,6 @@ name: Create and publish docker image
 
 on:
   push:
-    branches:
-      - main
     tags:
       - '*'
 
