@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Context, Result};
+use log::trace;
 use once_cell::sync::Lazy;
 use openpgp::armor::{Kind, Reader, ReaderMode};
 use regex::Regex;
@@ -6,7 +7,6 @@ use sequoia_openpgp as openpgp;
 use sha1::{Digest, Sha1};
 use std::io::Read;
 use std::path::Path;
-use log::trace;
 use tokio::fs;
 
 /// Match any text that has one @ sign and split at the @ sign
