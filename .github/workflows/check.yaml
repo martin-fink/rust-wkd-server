@@ -1,0 +1,13 @@
+name: Cargo check & test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    uses: martin-fink/reusable-workflows/.github/workflows/rust-check.yaml@main
+    with:
+      rust-version: stable
+      additional-dependencies: 'clang llvm pkg-config nettle-dev'
