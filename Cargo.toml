@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.74"
-axum = { version = "0.6.19", features = ["tower-log"] }
+axum = { version = "0.6.20", features = ["tower-log"] }
 axum-macros = "0.3.8"
 clap = { version = "4.3.21", features = ["derive", "env"] }
 dotenv = "0.15.0"
