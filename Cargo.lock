@@ -2108,7 +2108,6 @@ dependencies = [
  "clap",
  "dotenv",
  "env_logger",
- "log",
  "once_cell",
  "regex",
  "sequoia-openpgp",

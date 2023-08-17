@@ -4,7 +4,7 @@ use crate::utils::keys;
 use axum::extract::{Host, Path, State};
 use axum::routing::get;
 use axum::Router;
-use log::info;
+use tracing::info;
 
 type KeyResponse = Vec<u8>;
 

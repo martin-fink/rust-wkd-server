@@ -1,13 +1,16 @@
+use std::{net::SocketAddr, sync::Arc};
+
+use anyhow::Context;
+use axum::Router;
+use tower::ServiceBuilder;
+use tower_http::trace::TraceLayer;
+use tracing::info;
+
+use crate::config::Config;
+
 pub mod errors;
 pub mod keys;
 pub mod policy;
-
-use crate::config::Config;
-use anyhow::Context;
-use axum::Router;
-use std::{net::SocketAddr, sync::Arc};
-use tower::ServiceBuilder;
-use tower_http::trace::TraceLayer;
 
 #[derive(Clone)]
 pub struct ApiContext {
@@ -23,6 +26,8 @@ pub async fn serve(config: Config) -> anyhow::Result<()> {
             config: Arc::new(config),
         })
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
+
+    info!("WKD server listening on {}", socket_addr);
 
     axum::Server::bind(&socket_addr)
         .serve(app.into_make_service())

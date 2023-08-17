@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Context, Result};
-use log::trace;
 use once_cell::sync::Lazy;
 use openpgp::armor::{Kind, Reader, ReaderMode};
 use regex::Regex;
@@ -8,6 +7,7 @@ use sha1::{Digest, Sha1};
 use std::io::Read;
 use std::path::Path;
 use tokio::fs;
+use tracing::trace;
 
 /// Match any text that has one @ sign and split at the @ sign
 /// Trailing optional .asc is not included in the domain. See some examples below.
