@@ -58,8 +58,8 @@ services:
             - ./keys:/openpgp-keys:ro
         ports:
             - 127.0.0.1:8080:8080
-        env:
-            - RUST_LOG="error,wkd_server=info" # change this to trace for debugging
+        environment:
+            - RUST_LOG=error,wkd_server=info # change this to trace for debugging
 ```
 
 #### Reverse proxy setup
