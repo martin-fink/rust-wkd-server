@@ -6,7 +6,7 @@ https://wiki.gnupg.org/WKD
 
 ## Running this project
 
-Put your __public__ keys into `./openpgp/keys`.
+Put your **public** keys into `./openpgp/keys`.
 Files should be named after the email address that the key is registered for.
 See some examples below:
 
@@ -52,14 +52,21 @@ deployment. Make sure to add your public keys as a volume.
 
 ```yaml
 services:
-    wkd-server:
-        image: ghcr.io/martin-fink/rust-wkd-server:latest
-        volumes:
-            - ./keys:/openpgp-keys:ro
-        ports:
-            - 127.0.0.1:8080:8080
-        environment:
-            - RUST_LOG=error,wkd_server=info # change this to trace for debugging
+  wkd-server:
+    image: ghcr.io/martin-fink/rust-wkd-server:latest
+    volumes:
+      - ./keys:/openpgp-keys:ro
+    ports:
+      - 127.0.0.1:8080:8080
+    environment:
+      - RUST_LOG=error,wkd_server=info # change this to trace for debugging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rust-wkd-server.rule=(Host(`<your-domain>`) && PathPrefix(`/.well-known/openpgpkey`))"
+      - "traefik.http.routers.rust-wkd-server.entrypoints=<your-https-entrypoint>"
+      - "traefik.http.routers.rust-wkd-server.tls=true"
+      - "traefik.http.routers.rust-wkd-server.tls.certResolver=<your-certResolver>"
+      - "traefik.services.wkd-resch-io.loadbalancer.passHostHeader=true"
 ```
 
 #### Reverse proxy setup
