@@ -9,7 +9,7 @@ edition = "2021"
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["tower-log"] }
 axum-macros = "0.3.8"
-clap = { version = "4.3.21", features = ["derive", "env"] }
+clap = { version = "4.3.22", features = ["derive", "env"] }
 dotenv = "0.15.0"
 env_logger = "0.10.0"
 log = "0.4.20"
