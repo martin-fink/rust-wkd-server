@@ -66,7 +66,7 @@ services:
       - "traefik.http.routers.rust-wkd-server.entrypoints=<your-https-entrypoint>"
       - "traefik.http.routers.rust-wkd-server.tls=true"
       - "traefik.http.routers.rust-wkd-server.tls.certResolver=<your-certResolver>"
-      - "traefik.services.wkd-resch-io.loadbalancer.passHostHeader=true"
+      - "traefik.services.rust-wkd-server.loadbalancer.passHostHeader=true"
 ```
 
 #### Reverse proxy setup
