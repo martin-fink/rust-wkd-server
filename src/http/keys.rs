@@ -13,10 +13,11 @@ pub async fn get_key(
     Path(hash): Path<String>,
     Host(domain): Host,
 ) -> Result<KeyResponse, ApiError> {
-    info!("Got request for domain {domain}, hash {hash}");
     if let Some(key) = keys::get_key_for_hash(&state.config.keys_path, &hash, &domain).await? {
+        info!("Serving key for domain {domain}, hash {hash}.");
         Ok(key)
     } else {
+        info!("No match found for domain {domain}, hash {hash}.");
         Err(ApiError::NotFound)
     }
 }
