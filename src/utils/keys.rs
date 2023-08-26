@@ -35,7 +35,10 @@ pub async fn get_key_for_hash(path: &str, hash: &str, domain: &str) -> Result<Op
     while let Some(file) = read_dir.next_entry().await? {
         let filename = file.file_name();
         let Some(filename) = filename.to_str() else {
-            return Err(anyhow!("Filename is not valid utf-8: {:?}", &file.file_name()));
+            return Err(anyhow!(
+                "Filename is not valid utf-8: {:?}",
+                &file.file_name()
+            ));
         };
         let Some(captures) = FILE_REGEX.captures(filename) else {
             trace!("Ignoring '{filename}'.");
