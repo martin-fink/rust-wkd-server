@@ -17,7 +17,7 @@ regex = "1.10.2"
 sequoia-openpgp = "1.17.0"
 sha1 = { version = "0.10.6", features = ["sha1-asm"] }
 time = "0.3.30"
-tokio = { version = "1.35.0", features = ["full"] }
+tokio = { version = "1.35.1", features = ["full"] }
 tower = "0.4.13"
 tower-http = { version = "0.4.4", features = ["trace", "cors"] }
 tracing = "0.1.40"
