@@ -28,9 +28,8 @@ pub async fn serve(config: Config) -> anyhow::Result<()> {
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
 
     info!("WKD server listening on {}", socket_addr);
-
-    axum::Server::bind(&socket_addr)
-        .serve(app.into_make_service())
+    let listener = tokio::net::TcpListener::bind(socket_addr).await?;
+    axum::serve(listener, app.into_make_service())
         .await
         .context("error running HTTP server")
 }
