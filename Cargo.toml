@@ -9,7 +9,7 @@ description = "A WKD server"
 
 [dependencies]
 anyhow = "1.0.79"
-axum = { version = "0.7.3", features = ["tower-log"] }
+axum = { version = "0.7.4", features = ["tower-log"] }
 axum-macros = "0.4.0"
 clap = { version = "4.4.14", features = ["derive", "env"] }
 dotenv = "0.15.0"
