@@ -1,9 +1,10 @@
 [package]
 name = "wkd-server"
-version = "1.0.3"
+version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/martin-fink/rust-wkd-server"
 description = "A WKD server"
+license = "GPLv3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
