@@ -19,6 +19,9 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install native dependencies
+        run: apt-get install -y clang llvm pkg-config nettle-dev 
+
       - name: Run release-plz
         uses: MarcoIeni/release-plz-action@v0.5
         env:
