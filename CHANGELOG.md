@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+<<<<<<< Updated upstream
 ## [1.1.1] - 2024-04-10
+=======
+## [1.1.1] - 2024-04-11
+>>>>>>> Stashed changes
 
 ### Miscellaneous Tasks
 
