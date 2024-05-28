@@ -10,7 +10,7 @@ use tokio::sync::{RwLock, RwLockWriteGuard};
 use tokio::{fs, task};
 use tracing::{debug, error, info};
 
-#[derive(Eq, PartialEq, Hash)]
+#[derive(Eq, PartialEq, Hash, Debug)]
 pub struct KeyEntry {
     pub hashed_username: String,
     pub domain: String,
