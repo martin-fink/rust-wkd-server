@@ -1,6 +1,5 @@
 use crate::http::errors::ApiError;
 use crate::http::ApiContext;
-use crate::utils::keys;
 use axum::extract::{Host, Path, State};
 use axum::routing::get;
 use axum::Router;
@@ -13,7 +12,7 @@ pub async fn get_key(
     Path(hash): Path<String>,
     Host(domain): Host,
 ) -> Result<KeyResponse, ApiError> {
-    if let Some(key) = keys::get_key_for_hash(&state.config.keys_path, &hash, &domain).await? {
+    if let Some(key) = state.key_db.get(&hash, &domain).await? {
         info!("Serving key for domain {domain}, hash {hash}.");
         Ok(key)
     } else {

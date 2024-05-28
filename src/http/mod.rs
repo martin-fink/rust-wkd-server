@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::{net::SocketAddr, sync::Arc};
 
 use anyhow::Context;
@@ -7,6 +8,7 @@ use tower_http::trace::TraceLayer;
 use tracing::info;
 
 use crate::config::Config;
+use crate::keys::KeyDb;
 
 pub mod errors;
 pub mod keys;
@@ -15,15 +17,18 @@ pub mod policy;
 #[derive(Clone)]
 pub struct ApiContext {
     config: Arc<Config>,
+    key_db: Arc<KeyDb>,
 }
 
 pub async fn serve(config: Config) -> anyhow::Result<()> {
     let socket_addr: SocketAddr = format!("{}:{}", config.address, config.port)
         .as_str()
         .parse()?;
+    let cache = KeyDb::new(Path::new(&config.keys_path)).await?;
     let app = api_router()
         .with_state(ApiContext {
             config: Arc::new(config),
+            key_db: Arc::new(cache),
         })
         .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
 
