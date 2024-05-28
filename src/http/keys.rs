@@ -5,13 +5,11 @@ use axum::routing::get;
 use axum::Router;
 use tracing::info;
 
-type KeyResponse = Vec<u8>;
-
 pub async fn get_key(
     State(state): State<ApiContext>,
     Path(hash): Path<String>,
     Host(domain): Host,
-) -> Result<KeyResponse, ApiError> {
+) -> Result<Vec<u8>, ApiError> {
     if let Some(key) = state.key_db.get(&hash, &domain).await? {
         info!("Serving key for domain {domain}, hash {hash}.");
         Ok(key)
