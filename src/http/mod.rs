@@ -3,6 +3,7 @@ use std::{net::SocketAddr, sync::Arc};
 
 use anyhow::Context;
 use axum::Router;
+use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 use tracing::info;
@@ -35,8 +36,33 @@ pub async fn serve(config: Config) -> anyhow::Result<()> {
     info!("WKD server listening on {}", socket_addr);
     let listener = tokio::net::TcpListener::bind(socket_addr).await?;
     axum::serve(listener, app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
         .await
         .context("error running HTTP server")
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
 }
 
 fn api_router() -> Router<ApiContext> {
