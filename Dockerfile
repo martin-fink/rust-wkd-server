@@ -1,8 +1,8 @@
-FROM rust:latest as build-stage
+FROM rust:alpine as build-stage
 
 WORKDIR /build
 
-RUN apt-get -y update && apt-get -y install clang llvm pkg-config nettle-dev
+RUN apk add --no-cache musl-dev
 
 COPY Cargo.toml Cargo.lock /build/
 
@@ -18,7 +18,7 @@ RUN touch /build/src/main.rs
 RUN cargo build --release
 
 # Create a minimal docker image
-FROM debian:stable-slim
+FROM alpine
 
 ENV RUST_LOG="error,wkd_server=info"
 COPY --from=build-stage /build/target/release/wkd-server /wkd-server
