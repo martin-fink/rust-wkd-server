@@ -18,7 +18,7 @@ RUN touch /build/src/main.rs
 RUN cargo build --release
 
 # Create a minimal docker image
-FROM debian:bullseye-slim
+FROM debian:stable-slim
 
 ENV RUST_LOG="error,wkd_server=info"
 COPY --from=build-stage /build/target/release/wkd-server /wkd-server
