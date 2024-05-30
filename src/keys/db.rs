@@ -39,19 +39,15 @@ impl KeyDb {
         watcher.watch(key_path, notify::RecursiveMode::Recursive)?;
 
         task::spawn(async move {
-            loop {
-                match rx.recv() {
-                    Ok(Ok(event)) => {
+            while let Ok(event) = rx.recv() {
+                match event {
+                    Ok(event) => {
                         debug!("event: {:?}", event);
                         if let Err(e) = Self::handle_file_event(&inner_cache, event).await {
                             error!("Error while handling file event: {:?}", e);
                         }
                     }
-                    Ok(Err(error)) => error!("watch error: {:?}", error),
-                    Err(e) => {
-                        error!("channel was closed: {:?}", e);
-                        break;
-                    }
+                    Err(error) => error!("watch error: {:?}", error),
                 }
             }
         });
