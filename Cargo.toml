@@ -10,7 +10,7 @@ license = "GPL-3.0"
 
 [dependencies]
 anyhow = "1.0.89"
-axum = { version = "0.7.6", features = ["tower-log"] }
+axum = { version = "0.7.7", features = ["tower-log"] }
 axum-macros = "0.4.2"
 clap = { version = "4.5.18", features = ["derive", "env"] }
 dotenv = "0.15.0"
