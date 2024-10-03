@@ -1,8 +1,6 @@
-FROM rust:alpine as build-stage
+FROM rust:latest as build-stage
 
 WORKDIR /build
-
-RUN apk add --no-cache musl-dev
 
 COPY Cargo.toml Cargo.lock /build/
 
@@ -18,7 +16,7 @@ RUN touch /build/src/main.rs
 RUN cargo build --release
 
 # Create a minimal docker image
-FROM alpine
+FROM debian:stable-slim
 
 ENV RUST_LOG="error,wkd_server=info"
 COPY --from=build-stage /build/target/release/wkd-server /wkd-server
