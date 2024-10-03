@@ -1,0 +1,21 @@
+name: Build and publish docker image
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    uses: martin-fink/reusable-workflows/.github/workflows/buildx.yaml@main
+    with:
+      image: ghcr.io/${{ github.repository }}
+      container-registry: ghcr.io
+      platforms: linux/amd64,linux/arm64
+    secrets:
+      container-registry-username: ${{ github.actor }}
+      container-registry-password: ${{ secrets.GITHUB_TOKEN }}
