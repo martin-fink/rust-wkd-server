@@ -1,6 +1,6 @@
 [package]
 name = "wkd-server"
-version = "1.2.3"
+version = "1.2.4"
 edition = "2021"
 repository = "https://github.com/martin-fink/rust-wkd-server"
 description = "A WKD server"
