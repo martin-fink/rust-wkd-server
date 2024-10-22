@@ -21,7 +21,7 @@ regex = "1.11.0"
 sequoia-openpgp = { version = "1.21.2", default-features = false, features = ["crypto-rust", "allow-experimental-crypto", "allow-variable-time-crypto"] }
 sha1 = { version = "0.10.6", features = ["sha1-asm"] }
 time = "0.3.36"
-tokio = { version = "1.40.0", features = ["full"] }
+tokio = { version = "1.41.0", features = ["full"] }
 tower = "0.5.1"
 tower-http = { version = "0.6.1", features = ["trace", "cors"] }
 tracing = "0.1.40"
