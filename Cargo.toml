@@ -9,7 +9,7 @@ license = "GPL-3.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.90"
+anyhow = "1.0.91"
 axum = { version = "0.7.7", features = ["tower-log"] }
 axum-macros = "0.4.2"
 clap = { version = "4.5.20", features = ["derive", "env"] }
