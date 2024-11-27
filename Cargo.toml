@@ -24,7 +24,7 @@ time = "0.3.36"
 tokio = { version = "1.41.1", features = ["full"] }
 tower = "0.5.1"
 tower-http = { version = "0.6.2", features = ["trace", "cors"] }
-tracing = "0.1.40"
+tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 zbase32 = "0.1.2"
 
