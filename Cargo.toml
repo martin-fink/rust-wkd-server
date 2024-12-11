@@ -22,7 +22,7 @@ sequoia-openpgp = { version = "1.21.2", default-features = false, features = ["c
 sha1 = { version = "0.10.6", features = ["sha1-asm"] }
 time = "0.3.37"
 tokio = { version = "1.42.0", features = ["full"] }
-tower = "0.5.1"
+tower = "0.5.2"
 tower-http = { version = "0.6.2", features = ["trace", "cors"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
