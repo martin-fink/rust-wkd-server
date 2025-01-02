@@ -21,5 +21,5 @@ pub async fn get_key(
 }
 
 pub fn router() -> Router<ApiContext> {
-    Router::new().route("/.well-known/openpgpkey/hu/:key", get(get_key))
+    Router::new().route("/.well-known/openpgpkey/hu/{key}", get(get_key))
 }
