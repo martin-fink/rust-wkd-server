@@ -1,8 +1,9 @@
 use crate::http::errors::ApiError;
 use crate::http::ApiContext;
-use axum::extract::{Host, Path, State};
+use axum::extract::{Path, State};
 use axum::routing::get;
 use axum::Router;
+use axum_extra::extract::Host;
 use tracing::info;
 
 pub async fn get_key(
