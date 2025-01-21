@@ -12,7 +12,7 @@ license = "GPL-3.0"
 anyhow = "1.0.95"
 axum = { version = "0.8.1", features = ["tower-log"] }
 axum-extra = "0.10.0-rc.1"
-clap = { version = "4.5.26", features = ["derive", "env"] }
+clap = { version = "4.5.27", features = ["derive", "env"] }
 dotenv = "0.15.0"
 env_logger = "0.11.6"
 notify = "8.0.0"
