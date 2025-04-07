@@ -16,7 +16,7 @@ RUN touch src/main.rs
 RUN cargo build --release
 
 # Create a minimal docker image
-FROM cgr.dev/chainguard/glibc-dynamic
+FROM debian:stable-slim
 
 ENV RUST_LOG="error,wkd_server=info"
 COPY --from=build --chown=nonroot:nonroot /build/target/release/wkd-server /usr/local/bin/
