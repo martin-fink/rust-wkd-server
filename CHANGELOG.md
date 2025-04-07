@@ -11,7 +11,9 @@ All notable changes to this project will be documented in this file.
 ### Features
 
 - Support advanced method
-- Extract user ids from certificate instead of filename
+- Extract user ids from certificate instead of filename  
+  This means that it is no longer required to follow a specific file naming scheme. Instead,
+  all files that contain pgp keys will be added to the cache.
 
 ### Miscellaneous Tasks
 
