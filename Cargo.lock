@@ -2775,6 +2775,7 @@ dependencies = [
  "once_cell",
  "regex",
  "sequoia-openpgp",
+ "serde",
  "sha1",
  "tokio",
  "tower",

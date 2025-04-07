@@ -2,6 +2,8 @@ use crate::keys::fs::{file_to_key_entry, read_key_file};
 use anyhow::{bail, Context, Result};
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use notify::{EventKind, RecommendedWatcher, Watcher};
+use sequoia_openpgp::serialize::SerializeInto;
+use sequoia_openpgp::Cert;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::mpsc::channel;
@@ -11,12 +13,18 @@ use tokio::{fs, task};
 use tracing::{debug, error, info};
 
 #[derive(Eq, PartialEq, Hash, Debug)]
-pub struct KeyEntry {
+pub struct CertKey {
     pub hashed_username: String,
     pub domain: String,
 }
 
-type Cache = HashMap<KeyEntry, Vec<u8>>;
+#[derive(Clone, Debug)]
+pub struct CertEntry {
+    pub username: String,
+    pub cert: Cert,
+}
+
+type Cache = HashMap<CertKey, CertEntry>;
 
 pub struct KeyDb {
     _watcher: RecommendedWatcher,
@@ -123,7 +131,7 @@ impl KeyDb {
     }
 
     fn remove_file_from_cache(cache: &mut RwLockWriteGuard<Cache>, path: &Path) -> Result<()> {
-        let Some(entry) = &file_to_key_entry(path).context("Ignoring file")? else {
+        let Some((_, entry)) = &file_to_key_entry(path).context("Ignoring file")? else {
             info!("Ignoring file {}", path.to_string_lossy());
             return Ok(());
         };
@@ -133,16 +141,28 @@ impl KeyDb {
         Ok(())
     }
 
-    pub async fn get(&self, hash: &str, domain: &str) -> Result<Option<Vec<u8>>> {
+    pub async fn get(
+        &self,
+        hash: &str,
+        domain: &str,
+        username: Option<&String>,
+    ) -> Result<Option<Vec<u8>>> {
         let value = self
             .keys
             .read()
             .await
-            .get(&KeyEntry {
+            .get(&CertKey {
                 hashed_username: hash.to_string(),
                 domain: domain.to_string(),
             })
             .cloned();
-        Ok(value)
+
+        match (username, value) {
+            (Some(requested), Some(CertEntry { username, .. })) if requested != &username => {
+                info!("hash matched for '{username}@{domain}', but requested local part '{requested}' did not match. Ignoring.");
+                Ok(None)
+            }
+            (_, value) => Ok(value.map(|entry| entry.cert.to_vec().unwrap())),
+        }
     }
 }

@@ -72,10 +72,33 @@ services:
 #### Reverse proxy setup
 
 You probably want to move this behind a reverse proxy such as nginx in order for it to handle https.
-You can use the following snippet for nginx.
-The important bit is to set the `X-Forwarded-Host` header, as that header is used to differentiate domains.
+You can use the following snippets for nginx.
+
+##### Advanced method
+
+Set up a subdomain `openpgpkey.`, e.g., `openpgpkey.example.org`;
+The WKD client will try to access `https://openpgpkey.example.org/.well-known/openpgpkey/example.org/hu/{hash}`.
 
 ```nginx
+server_name openpgpkey.example.org;
+
+location ^~ /.well-known/openpgpkey {
+    resolver 127.0.0.11 valid=5s;
+    set $upstream_endpoint http://address:port;
+    proxy_pass $upstream_endpoint;
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-Host $host;
+}
+```
+
+##### Direct method
+
+The important bit is to set the `X-Forwarded-Host` header, as that header is used to differentiate domains.
+In this case, the WKD client will try to access `https://example.org/.well-known/openpgpkey/hu/{hash}`
+
+```nginx
+server_name example.org;
+
 location ^~ /.well-known/openpgpkey {
     resolver 127.0.0.11 valid=5s;
     set $upstream_endpoint http://address:port;
