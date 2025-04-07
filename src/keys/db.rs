@@ -1,10 +1,12 @@
-use crate::keys::fs::{file_to_key_entry, read_key_file};
+use crate::keys::fs::read_key_file;
 use anyhow::{bail, Context, Result};
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use notify::{EventKind, RecommendedWatcher, Watcher};
 use sequoia_openpgp::serialize::SerializeInto;
 use sequoia_openpgp::Cert;
 use std::collections::HashMap;
+use std::ffi::OsString;
+use std::hash::Hash;
 use std::path::Path;
 use std::sync::mpsc::channel;
 use std::sync::Arc;
@@ -22,6 +24,7 @@ pub struct CertKey {
 pub struct CertEntry {
     pub username: String,
     pub cert: Cert,
+    pub path: OsString,
 }
 
 type Cache = HashMap<CertKey, CertEntry>;
@@ -32,7 +35,7 @@ pub struct KeyDb {
 }
 
 impl KeyDb {
-    pub async fn new(key_path: &Path) -> Result<Self> {
+    pub async fn new(key_path: &Path, split_keys: bool) -> Result<Self> {
         if !key_path.exists() || !key_path.is_dir() {
             bail!("Key path not found");
         }
@@ -51,7 +54,9 @@ impl KeyDb {
                 match event {
                     Ok(event) => {
                         debug!("event: {:?}", event);
-                        if let Err(e) = Self::handle_file_event(&inner_cache, event).await {
+                        if let Err(e) =
+                            Self::handle_file_event(&inner_cache, event, split_keys).await
+                        {
                             error!("Error while handling file event: {:?}", e);
                         }
                     }
@@ -65,18 +70,20 @@ impl KeyDb {
             keys: cache,
         };
 
-        db.populate(key_path).await?;
+        db.populate(key_path, split_keys).await?;
 
         Ok(db)
     }
 
-    async fn populate(&mut self, key_path: &Path) -> Result<()> {
+    async fn populate(&mut self, key_path: &Path, split_keys: bool) -> Result<()> {
+        info!("Populating keys db, key splitting enabled: {split_keys}");
+
         let mut read_dir = fs::read_dir(key_path).await?;
 
         let mut lock = self.keys.write().await;
 
         while let Some(file) = read_dir.next_entry().await? {
-            if let Err(e) = Self::cache_file(&mut lock, &file.path()) {
+            if let Err(e) = Self::cache_file(&mut lock, &file.path(), split_keys) {
                 error!("error caching file: {:?}", e);
             }
         }
@@ -86,16 +93,20 @@ impl KeyDb {
         Ok(())
     }
 
-    async fn handle_file_event(cache: &RwLock<Cache>, event: notify::Event) -> Result<()> {
+    async fn handle_file_event(
+        cache: &RwLock<Cache>,
+        event: notify::Event,
+        split_keys: bool,
+    ) -> Result<()> {
         match event.kind {
             EventKind::Create(CreateKind::File) => {
                 for path in event.paths {
-                    Self::cache_file(&mut cache.write().await, &path)?;
+                    Self::cache_file(&mut cache.write().await, &path, split_keys)?;
                 }
             }
             EventKind::Modify(ModifyKind::Data(_)) => {
                 for path in event.paths {
-                    Self::cache_file(&mut cache.write().await, &path)?;
+                    Self::cache_file(&mut cache.write().await, &path, split_keys)?;
                 }
             }
             EventKind::Modify(ModifyKind::Name(_)) => {
@@ -103,7 +114,7 @@ impl KeyDb {
 
                 for path in event.paths {
                     if let Ok(true) = fs::try_exists(&path).await {
-                        Self::cache_file(&mut lock, &path)?;
+                        Self::cache_file(&mut lock, &path, split_keys)?;
                     } else {
                         Self::remove_file_from_cache(&mut lock, &path)?;
                     }
@@ -120,24 +131,34 @@ impl KeyDb {
         Ok(())
     }
 
-    fn cache_file(cache: &mut RwLockWriteGuard<Cache>, path: &Path) -> Result<()> {
-        let Some((entry, content)) = read_key_file(path).context("Reading file")? else {
-            info!("ignoring file {}", path.to_string_lossy());
+    fn cache_file(
+        cache: &mut RwLockWriteGuard<Cache>,
+        path: &Path,
+        split_keys: bool,
+    ) -> Result<()> {
+        // first, we remove all files that might be in here still because of this path
+        Self::remove_file_from_cache(cache, path)?;
+
+        let entries = read_key_file(path, split_keys).context("Reading file")?;
+        if entries.is_empty() {
+            info!("Ignoring file {}, no entries found", path.to_string_lossy());
             return Ok(());
-        };
-        cache.insert(entry, content);
-        info!("Added key {} to db", path.to_string_lossy());
+        }
+        entries.into_iter().for_each(|(entry, content)| {
+            info!(
+                "Adding key '{}@{}' from file {} to db",
+                content.username,
+                entry.domain,
+                path.to_string_lossy()
+            );
+            cache.insert(entry, content);
+        });
         Ok(())
     }
 
     fn remove_file_from_cache(cache: &mut RwLockWriteGuard<Cache>, path: &Path) -> Result<()> {
-        let Some((_, entry)) = &file_to_key_entry(path).context("Ignoring file")? else {
-            info!("Ignoring file {}", path.to_string_lossy());
-            return Ok(());
-        };
-        if cache.remove(entry).is_some() {
-            info!("Removed key {} from db", path.to_string_lossy());
-        }
+        // we remove all items that were inserted into the map because of this file.
+        cache.retain(|_, v| v.path != path.as_os_str());
         Ok(())
     }
 

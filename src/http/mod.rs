@@ -25,7 +25,7 @@ pub async fn serve(config: Config) -> anyhow::Result<()> {
     let socket_addr: SocketAddr = format!("{}:{}", config.address, config.port)
         .as_str()
         .parse()?;
-    let cache = KeyDb::new(Path::new(&config.keys_path)).await?;
+    let cache = KeyDb::new(Path::new(&config.keys_path), config.split_keys).await?;
     let app = api_router()
         .with_state(ApiContext {
             config: Arc::new(config),

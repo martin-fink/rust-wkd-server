@@ -7,15 +7,10 @@ https://wiki.gnupg.org/WKD
 ## Running this project
 
 Put your **public** keys into `./openpgp/keys`.
-Files should be named after the email address that the key is registered for.
-See some examples below:
-
-- Valid names:
-  - `user@example.com`
-  - `user@example.com.asc` (optional `.asc` file ending will be ignored)
-- Invalid names:
-  - `ktujkt7nrz91b17es7prizffedzxrsna` (wkd hash -- this tool will hash the username)
-  - `my-public-key.asc`
+The name of the file does not matter, this service extracts all user ids and serves them.
+By default, every key in the directory is loaded and all associated user IDs are made available via the API.
+You can restrict responses to a specific user ID by enabling the `--split-keys` option or setting the `SPLIT_KEYS=true`
+environment variable. In this mode, each request will only return the matching user ID and its corresponding key.
 
 Optionally, put your policy into a text file in `./openpgp`.
 

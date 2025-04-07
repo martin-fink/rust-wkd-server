@@ -7,12 +7,21 @@ pub struct Config {
     /// The path where the GPG keys are stored
     pub keys_path: String,
     #[clap(long, env, default_value = "0.0.0.0")]
+    /// Address to bind the HTTP server to.
+    /// Defaults to 0.0.0.0 to listen on all interfaces.
     pub address: String,
     #[clap(long, env, default_value = "8080")]
+    /// Port to bind the HTTP server to.
+    /// Defaults to 8080.
     pub port: String,
     /// The path to the policy file. If not set, an empty policy is served.
     #[clap(long, short, env)]
     pub policy: Option<String>,
+    #[clap(long, env)]
+    /// Split certificate into individual user IDs.
+    /// If set, only the requested user ID and corresponding key will be returned from the certificate.
+    /// Otherwise, the response will include all user IDs and keys found in the file.
+    pub split_keys: bool,
 }
 
 impl Config {
