@@ -28,11 +28,18 @@ Arguments:
   <KEYS_PATH>  The path where the GPG keys are stored
 
 Options:
-      --address <ADDRESS>  [env: ADDRESS=] [default: 0.0.0.0]
-      --port <PORT>        [env: PORT=] [default: 8080]
-  -p, --policy <POLICY>    The path to the policy file. If not set, an empty policy is served [env: POLICY=]
+      --address <ADDRESS>  Address to bind the HTTP server to. Defaults to 0.0.0.0 to listen on all interfaces [env: ADDRESS=] [default: 0.0.0.0]
+      --port <PORT>        Port to bind the HTTP server to. Defaults to 8080 [env: PORT=] [default: 8080]
+  -p, --policy <POLICY>    The path to the policy directory. If not set, an empty policy is served [env: POLICY=]
+      --split-keys         Split certificate into individual user IDs. If set, only the requested user ID and corresponding key will be returned from the certificate. Otherwise, the response will include all user IDs and keys found in the file [env: SPLIT_KEYS=]
   -h, --help               Print help
 ```
+
+### Policy
+
+The policy directory can contain the following files:
+- `default`: This is the default policy served for all domains, if no more specific policy can be found.
+- `$domain`: This is the policy that should be served for a specific domain. Example: `example.com`.
 
 ### Security
 

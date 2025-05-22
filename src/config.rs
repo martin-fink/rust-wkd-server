@@ -14,7 +14,7 @@ pub struct Config {
     /// Port to bind the HTTP server to.
     /// Defaults to 8080.
     pub port: String,
-    /// The path to the policy file. If not set, an empty policy is served.
+    /// The path to the policy directory. If not set, an empty policy is served.
     #[clap(long, short, env)]
     pub policy: Option<String>,
     #[clap(long, env)]
@@ -39,8 +39,8 @@ impl Config {
 
         if let Some(policy) = &self.policy {
             let policy_path = Path::new(policy);
-            if !policy_path.exists() || policy_path.is_dir() {
-                return Err(anyhow!("Policy '{}' is not a file.", policy));
+            if !policy_path.exists() || !policy_path.is_dir() {
+                return Err(anyhow!("Policy directory '{}' is not a directory.", policy));
             }
         }
 

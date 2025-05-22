@@ -5,6 +5,7 @@ use clap::Parser;
 mod config;
 mod http;
 mod keys;
+mod policy;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
