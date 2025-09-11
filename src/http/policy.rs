@@ -1,9 +1,9 @@
-use crate::http::errors::ApiError;
 use crate::http::ApiContext;
+use crate::http::errors::ApiError;
 use crate::policy::get_policy;
+use axum::Router;
 use axum::extract::{Path, State};
 use axum::routing::get;
-use axum::Router;
 use axum_extra::extract::Host;
 
 type PolicyResponse = String;

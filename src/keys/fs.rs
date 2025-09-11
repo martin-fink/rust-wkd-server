@@ -1,11 +1,11 @@
 use crate::keys::db::{CertEntry, CertKey};
 use crate::keys::hash;
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use openpgp::armor::{Kind, Reader, ReaderMode};
 use sequoia_openpgp as openpgp;
+use sequoia_openpgp::Cert;
 use sequoia_openpgp::parse::Parse;
 use sequoia_openpgp::policy::StandardPolicy;
-use sequoia_openpgp::Cert;
 use std::io::BufReader;
 use std::path::Path;
 use tracing::warn;

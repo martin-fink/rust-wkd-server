@@ -1,15 +1,15 @@
 use crate::keys::fs::read_key_file;
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use notify::{EventKind, RecommendedWatcher, Watcher};
-use sequoia_openpgp::serialize::SerializeInto;
 use sequoia_openpgp::Cert;
+use sequoia_openpgp::serialize::SerializeInto;
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::hash::Hash;
 use std::path::Path;
-use std::sync::mpsc::channel;
 use std::sync::Arc;
+use std::sync::mpsc::channel;
 use tokio::sync::{RwLock, RwLockWriteGuard};
 use tokio::{fs, task};
 use tracing::{debug, error, info};
@@ -180,7 +180,9 @@ impl KeyDb {
 
         match (username, value) {
             (Some(requested), Some(CertEntry { username, .. })) if requested != &username => {
-                info!("hash matched for '{username}@{domain}', but requested local part '{requested}' did not match. Ignoring.");
+                info!(
+                    "hash matched for '{username}@{domain}', but requested local part '{requested}' did not match. Ignoring."
+                );
                 Ok(None)
             }
             (_, value) => Ok(value.map(|entry| entry.cert.to_vec().unwrap())),

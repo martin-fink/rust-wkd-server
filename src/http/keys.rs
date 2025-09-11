@@ -1,8 +1,8 @@
-use crate::http::errors::ApiError;
 use crate::http::ApiContext;
+use crate::http::errors::ApiError;
+use axum::Router;
 use axum::extract::{Path, Query, State};
 use axum::routing::get;
-use axum::Router;
 use axum_extra::extract::Host;
 use serde::Deserialize;
 use tracing::info;
