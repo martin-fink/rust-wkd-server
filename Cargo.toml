@@ -25,7 +25,7 @@ tower = "0.5.2"
 tower-http = { version = "0.6.6", features = ["trace", "cors"] }
 tracing = "0.1.41"
 zbase32 = "0.1.2"
-serde = { version = "1.0.226", features = ["derive"] }
+serde = { version = "1.0.227", features = ["derive"] }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
