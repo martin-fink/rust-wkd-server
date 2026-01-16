@@ -1,9 +1,10 @@
 use crate::http::ApiContext;
 use crate::http::errors::ApiError;
+use crate::http::host::domain_from_headers;
 use axum::Router;
 use axum::extract::{Path, Query, State};
+use axum::http::HeaderMap;
 use axum::routing::get;
-use axum_extra::extract::Host;
 use serde::Deserialize;
 use tracing::info;
 
@@ -25,8 +26,9 @@ async fn get_key(
 pub async fn get_key_direct(
     State(state): State<ApiContext>,
     Path(hash): Path<String>,
-    Host(domain): Host,
+    headers: HeaderMap,
 ) -> Result<Vec<u8>, ApiError> {
+    let domain = domain_from_headers(&headers)?;
     get_key(&state, &hash, &domain, None).await
 }
 

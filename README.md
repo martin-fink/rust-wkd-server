@@ -96,6 +96,7 @@ location ^~ /.well-known/openpgpkey {
 ##### Direct method
 
 The important bit is to set the `X-Forwarded-Host` header, as that header is used to differentiate domains.
+If the `X-Forwarded-Host` header is not set, the server will fall back to the `Host` header.
 In this case, the WKD client will try to access `https://example.org/.well-known/openpgpkey/hu/{hash}`
 
 ```nginx

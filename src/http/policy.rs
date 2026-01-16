@@ -1,10 +1,11 @@
 use crate::http::ApiContext;
 use crate::http::errors::ApiError;
+use crate::http::host::domain_from_headers;
 use crate::policy::get_policy;
 use axum::Router;
 use axum::extract::{Path, State};
+use axum::http::HeaderMap;
 use axum::routing::get;
-use axum_extra::extract::Host;
 
 type PolicyResponse = String;
 
@@ -21,8 +22,9 @@ fn get_policy_for_domain(state: &ApiContext, domain: &str) -> Result<PolicyRespo
 
 pub async fn get_policy_direct(
     State(state): State<ApiContext>,
-    Host(domain): Host,
+    headers: HeaderMap,
 ) -> Result<PolicyResponse, ApiError> {
+    let domain = domain_from_headers(&headers)?;
     get_policy_for_domain(&state, &domain)
 }
 

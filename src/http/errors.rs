@@ -4,6 +4,7 @@ use std::error::Error;
 
 pub enum ApiError {
     NotFound,
+    BadRequest(String),
     Internal(String),
 }
 
@@ -29,6 +30,7 @@ impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         match self {
             ApiError::NotFound => (StatusCode::NOT_FOUND, "Not Found.").into_response(),
+            ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg).into_response(),
             ApiError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg).into_response(),
         }
     }

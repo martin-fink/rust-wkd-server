@@ -12,6 +12,7 @@ use crate::config::Config;
 use crate::keys::KeyDb;
 
 pub mod errors;
+pub mod host;
 pub mod keys;
 pub mod policy;
 
