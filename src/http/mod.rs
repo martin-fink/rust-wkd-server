@@ -4,7 +4,7 @@ use std::{net::SocketAddr, sync::Arc};
 use anyhow::Context;
 use axum::Router;
 use tokio::signal;
-use tower::ServiceBuilder;
+use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
@@ -32,7 +32,8 @@ pub async fn serve(config: Config) -> anyhow::Result<()> {
             config: Arc::new(config),
             key_db: Arc::new(cache),
         })
-        .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
+        .layer(CorsLayer::permissive())
+        .layer(TraceLayer::new_for_http());
 
     info!("WKD server listening on {}", socket_addr);
     let listener = tokio::net::TcpListener::bind(socket_addr).await?;
