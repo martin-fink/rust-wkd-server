@@ -165,7 +165,7 @@ impl KeyDb {
     fn remove_file_from_cache(cache: &mut RwLockWriteGuard<Cache>, path: &Path) -> Result<()> {
         // we remove all items that were inserted into the map because of this file.
         cache.retain(|_, entries| {
-            entries.retain(|entry| entry.path != path.as_os_str());
+            entries.retain(|entry| !entry.path.eq_ignore_ascii_case(path.as_os_str()));
             !entries.is_empty()
         });
         Ok(())
@@ -192,9 +192,11 @@ impl KeyDb {
         };
 
         let values = if let Some(requested) = username {
+            // stored usernames are lowercased, see `mail_to_key_entry`
+            let requested_lowercase = requested.to_lowercase();
             let filtered = values
                 .into_iter()
-                .filter(|entry| &entry.username == requested)
+                .filter(|entry| entry.username == requested_lowercase)
                 .collect::<Vec<_>>();
 
             if filtered.is_empty() {
@@ -321,6 +323,58 @@ mod tests {
                 .expect("key data should exist");
 
             assert_eq!(parse_fingerprints(&content)?, vec![fingerprint.clone()]);
+        }
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn lookup_is_case_insensitive_for_local_part() -> Result<()> {
+        let tempdir = TempDir::new()?;
+        let email = "John.Doe@example.com";
+        // `gpg --with-wkd-hash` hashes the lowercased local part
+        let lowercase_hash = "ihyath4noz8dsckzjbuyqnh4kbup6h4i";
+        let case_sensitive_hash = "gyfn37m47x4mtno9si4ckwhdqr8ocdsz";
+
+        let (cert, _) = CertBuilder::general_purpose(Some(format!("John Doe <{email}>")))
+            .add_userid(format!("John Doe (work) <{email}>"))
+            .generate()?;
+        let cert = cert.strip_secret_key_material();
+        let fingerprint = cert.fingerprint().to_string();
+        std::fs::write(tempdir.path().join("john.asc"), cert.armored().to_vec()?)?;
+
+        for split_keys in [false, true] {
+            let db = KeyDb::new(tempdir.path(), split_keys).await?;
+
+            // direct method, no local part
+            let content = db
+                .get(lowercase_hash, "example.com", None)
+                .await?
+                .expect("key should be found by lowercase hash");
+            assert_eq!(parse_fingerprints(&content)?, vec![fingerprint.clone()]);
+
+            // advanced method, the `l` parameter must match regardless of case
+            for local_part in ["john.doe", "John.Doe", "John.doe", "JOHN.DOE"] {
+                let content = db
+                    .get(lowercase_hash, "example.com", Some(&local_part.to_string()))
+                    .await?
+                    .unwrap_or_else(|| panic!("key should be found for l={local_part}"));
+                assert_eq!(parse_fingerprints(&content)?, vec![fingerprint.clone()]);
+            }
+
+            // a local part that differs in more than case must still not match
+            assert!(
+                db.get(lowercase_hash, "example.com", Some(&"jane.doe".to_string()))
+                    .await?
+                    .is_none()
+            );
+
+            // the hash of the non-lowercased local part is not a valid WKD hash
+            assert!(
+                db.get(case_sensitive_hash, "example.com", None)
+                    .await?
+                    .is_none()
+            );
         }
 
         Ok(())

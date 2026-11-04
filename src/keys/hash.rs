@@ -25,8 +25,8 @@ pub fn mail_to_key_entry(email: &str) -> anyhow::Result<Option<(String, CertKey)
     };
 
     // Unwrap is ok here, as we know the regex
-    let username = captures.get(1).unwrap().as_str();
-    let hashed_username = hash_file_name(username);
+    let username = captures.get(1).unwrap().as_str().to_lowercase();
+    let hashed_username = hash_file_name(&username);
     let host = captures.get(2).unwrap().as_str();
 
     let key = CertKey {
@@ -34,7 +34,7 @@ pub fn mail_to_key_entry(email: &str) -> anyhow::Result<Option<(String, CertKey)
         domain: host.to_string(),
     };
 
-    Ok(Some((username.into(), key)))
+    Ok(Some((username, key)))
 }
 
 fn hash_file_name(name: &str) -> String {
@@ -97,6 +97,25 @@ mod tests {
                 }
             )
         );
+    }
+
+    #[test]
+    fn hash_uses_lowercase_local_part() {
+        // `gpg --with-wkd-hash` lowercases the local part before hashing
+        for email in [
+            "john.doe@example.com",
+            "John.Doe@example.com",
+            "JOHN.DOE@example.com",
+        ] {
+            let (_, key) = mail_to_key_entry(email).unwrap().unwrap();
+            assert_eq!(
+                key,
+                CertKey {
+                    hashed_username: "ihyath4noz8dsckzjbuyqnh4kbup6h4i".to_string(),
+                    domain: "example.com".to_string()
+                }
+            );
+        }
     }
 
     #[test]
