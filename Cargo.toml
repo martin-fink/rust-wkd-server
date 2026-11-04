@@ -32,3 +32,5 @@ serde = { version = "1.0.228", features = ["derive"] }
 inherits = "release"
 lto = "thin"
 
+[dev-dependencies]
+tempfile = "3.23.0"
